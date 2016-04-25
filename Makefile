@@ -14,8 +14,20 @@ DOCKER_PREP=eval `docker-machine env $(DOCKER_MACHINE_NAME)`
 DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
 
-here: here.go
-	go build ${LDFLAGS} here.go
+present: present.go
+	go build ${LDFLAGS} present.go
 
 clean:
-	rm -f here
+	rm -f present
+	rm -f we
+
+
+present-example: present
+	./present -s ./present.sh echo 'Hello World!'
+
+
+we: we.go
+	go build ${LDFLAGS} we.go
+
+we-example: we
+	./we -e example_env.yml env | sort

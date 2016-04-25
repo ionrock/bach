@@ -13,6 +13,7 @@ func RunScriptBefore(c *cli.Context) error {
 	fmt.Printf("Running Script: %s\n", script)
 
 	if script != "" {
+		fmt.Println(script)
 		cmd := core.NewCmd(script)
 		err := cmd.Run()
 		if err != nil {
