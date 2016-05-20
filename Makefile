@@ -14,24 +14,22 @@ DOCKER_PREP=eval `docker-machine env $(DOCKER_MACHINE_NAME)`
 DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
 
-present: present.go
-	go build ${LDFLAGS} present.go
+present: cmd/present.go
+	go build -o present ${LDFLAGS} cmd/present.go
 
 clean:
 	rm -f present
 	rm -f we
 
-
 present-example: present
 	./present -s ./present.sh echo 'Hello World!'
 
 
-we: we.go core/withenv.go
-	go build ${LDFLAGS} we.go
+we: cmd/we.go
+	go build -o we ${LDFLAGS} cmd/we.go
 
 we-example: we
 	./we -e example_env.yml echo 'Hello World!'
-
 
 test:
 	go test
