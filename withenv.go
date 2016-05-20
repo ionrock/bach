@@ -1,55 +1,47 @@
 package bach
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"strconv"
+	"os"
 )
 
+type Env struct {
+	Vars []EnvVar
+}
+
 type EnvVar struct {
-	Name  string
+	Key   string
 	Value string
 }
 
-// func CompileEnv(newEnv map[string]interface{}) {
-// 	for k, v := range newEnv {
-// 		value, ok := v.(string)
-// 		if !ok {
-// 			os.Setenv(k, UpdateEnv(v))
-// 		}
-// 	}
-// }
-
-func LoadYaml(path string) (map[string]interface{}, error) {
+func NewEnv(path string) (*Env, error) {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var container map[string]interface{}
+	var container Env
 
 	err = yaml.Unmarshal(b, &container)
 	if err != nil {
 		return nil, err
 	}
 
-	return container, nil
+	return &container, nil
 }
 
 func WithEnv(envfile string) error {
-	fmt.Println(envfile)
-	b, err := ioutil.ReadFile(envfile)
+	env, err := NewEnv(envfile)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	var container map[string]interface{}
-
-	err = yaml.Unmarshal(b, &container)
-	if err != nil {
-		return err
+	for _, ev := range env.Vars {
+		err = os.Setenv(ev.Key, ev.Value)
+		if err != nil {
+			panic(err)
+		}
 	}
-
 	return nil
 }
