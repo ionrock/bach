@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/ionrock/bach/core"
+	"github.com/ionrock/bach"
 )
 
 func RunScriptBefore(c *cli.Context) error {
@@ -14,7 +14,7 @@ func RunScriptBefore(c *cli.Context) error {
 
 	if script != "" {
 		fmt.Println(script)
-		cmd := core.NewCmd(script)
+		cmd := bach.NewCmd(script)
 		err := cmd.Run()
 		if err != nil {
 			return err
@@ -27,7 +27,7 @@ func RunScriptBefore(c *cli.Context) error {
 func GetHereApp() *cli.App {
 	app := cli.NewApp()
 	app.Before = RunScriptBefore
-	app.Action = core.CommandAction
+	app.Action = bach.CommandAction
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "script, s",

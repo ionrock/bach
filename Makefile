@@ -26,8 +26,12 @@ present-example: present
 	./present -s ./present.sh echo 'Hello World!'
 
 
-we: we.go
+we: we.go core/withenv.go
 	go build ${LDFLAGS} we.go
 
 we-example: we
-	./we -e example_env.yml env | sort
+	./we -e example_env.yml echo 'Hello World!'
+
+
+test:
+	go test

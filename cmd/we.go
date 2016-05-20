@@ -4,17 +4,17 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/ionrock/bach/core"
+	"github.com/ionrock/bach"
 )
 
 func We(c *cli.Context) error {
-	return core.WithEnv(c.String("env"))
+	return bach.WithEnv(c.String("env"))
 }
 
 func main() {
 	app := cli.NewApp()
 	app.Before = We
-	app.Action = core.CommandAction
+	app.Action = bach.CommandAction
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "env, e",

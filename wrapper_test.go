@@ -1,4 +1,4 @@
-package core
+package bach
 
 import (
 	"testing"
