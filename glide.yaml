@@ -1,0 +1,5 @@
+package: github.com/ionrock/bach
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/codegangsta/cli
+- package: gopkg.in/yaml.v2

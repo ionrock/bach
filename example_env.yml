@@ -1,2 +1,4 @@
 ---
-FOO: 'bar'
+- FOO: 'bar'
+- OS:
+    USERNAME: eric
