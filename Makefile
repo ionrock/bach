@@ -25,7 +25,7 @@ present-example: present
 	./present -s ./present.sh echo 'Hello World!'
 
 
-we: cmd/we.go
+we: $(SOURCES)
 	go build -o we ${LDFLAGS} cmd/we.go
 
 we-example: we
