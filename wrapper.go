@@ -15,7 +15,7 @@ func NewCmd(parts ...string) *exec.Cmd {
 	return cmd
 }
 
-func CommandAction(c *cli.Context) {
+func CommandAction(c *cli.Context) error {
 	cmd := NewCmd(c.Args()...)
-	cmd.Run()
+	return cmd.Run()
 }
