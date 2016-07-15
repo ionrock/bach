@@ -31,5 +31,11 @@ we: $(SOURCES)
 we-example: we
 	./we -e example_env.yml echo 'Hello World!'
 
+toconfig: $(SOURCES)
+	go build -o toconfig ${LDFLAGS} cmd/toconfig.go
+
+toconfig-example: toconfig
+	./toconfig -t example.conf.tmpl -c example.conf cat example.conf
+
 test:
 	go test
