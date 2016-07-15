@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/flynn/go-shlex"
 )
 
 func loadYaml(path string) ([]map[interface{}]interface{}, error) {
@@ -109,10 +108,7 @@ func (e EnvScript) Apply() map[string]string {
 		panic(err)
 	}
 
-	parts, err := shlex.Split(e.cmd)
-	if err != nil {
-		panic(err)
-	}
+	parts := SplitCommand(e.cmd)
 
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Stdout = tmp
