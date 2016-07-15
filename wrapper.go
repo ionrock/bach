@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/flynn/go-shlex"
 )
 
 func RunLogged(parts ...string) error {
@@ -45,6 +46,14 @@ func RunLogged(parts ...string) error {
 	return cmd.Wait()
 }
 
+func SplitCommand(cmd string) []string {
+	parts, err := shlex.Split(os.ExpandEnv(cmd))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return parts
+}
+
 func RunWrapped(parts ...string) error {
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Stdout = os.Stdout
@@ -55,7 +64,14 @@ func RunWrapped(parts ...string) error {
 }
 
 func CommandAction(c *cli.Context) error {
-	return RunWrapped(c.Args()...)
+	args := c.Args()
+	parts := make([]string, len(args))
+
+	for i, arg := range args {
+		parts[i] = os.ExpandEnv(arg)
+	}
+
+	return RunWrapped(parts...)
 }
 
 type Procs struct {
