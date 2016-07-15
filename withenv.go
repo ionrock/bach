@@ -132,7 +132,7 @@ func WithEnv(args []string) error {
 		case f == "--env" || f == "-e":
 			in_flag = "env"
 		case in_flag == "env":
-			log.Info("Applying  env: ", f)
+			log.Debug("Applying  env: ", f)
 			action := EnvFile{path: f}
 			action.Apply()
 			in_flag = ""
@@ -140,7 +140,7 @@ func WithEnv(args []string) error {
 		case f == "--script" || f == "-s":
 			in_flag = "script"
 		case in_flag == "script":
-			log.Info("Applying script: ", f)
+			log.Debug("Applying script: ", f)
 			action := EnvScript{cmd: f}
 			action.Apply()
 			in_flag = ""
