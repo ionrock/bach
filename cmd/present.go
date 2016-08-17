@@ -14,7 +14,7 @@ func RunScriptBefore(c *cli.Context) error {
 
 	if script != "" {
 		fmt.Println(script)
-		cmd := bach.NewCmd(script)
+		cmd := bach.NewCommand(script)
 		err := cmd.Run()
 		if err != nil {
 			return err

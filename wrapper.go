@@ -63,6 +63,16 @@ func RunWrapped(parts ...string) error {
 	return cmd.Run()
 }
 
+func NewCommand(script string) *exec.Cmd {
+	parts := SplitCommand(script)
+	cmd := exec.Command(parts[0], parts[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	return cmd
+}
+
 func CommandAction(c *cli.Context) error {
 	args := c.Args()
 	parts := make([]string, len(args))
