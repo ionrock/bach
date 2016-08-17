@@ -17,7 +17,7 @@ type EnvFile struct {
 }
 
 func (e EnvFile) Parse() (map[string]string, error) {
-	f := NewFlattener(e.path)
+	f := Flattener{e.path}
 
 	env, err := f.Flatten()
 	if err != nil {
