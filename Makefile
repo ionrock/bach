@@ -13,6 +13,7 @@ DOCKER_MACHINE_NAME=default
 DOCKER_PREP=eval `docker-machine env $(DOCKER_MACHINE_NAME)`
 DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
+all: present we toconfig
 
 present: cmd/present.go
 	go build -o present ${LDFLAGS} cmd/present.go
