@@ -8,19 +8,30 @@ import (
 )
 
 func RunScriptBefore(c *cli.Context) error {
-	return bach.RunScriptBefore(c.String("script"))
+	return bach.RunScript(c.String("start"))
+}
+
+func RunScriptAfter(c *cli.Context) error {
+	return bach.RunScript(c.String("after"))
 }
 
 func GetHereApp() *cli.App {
 	app := cli.NewApp()
 	app.Before = RunScriptBefore
+	app.After = RunScriptAfter
 	app.Action = bach.CommandAction
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "script, s",
+			Name:   "start, s",
 			Value:  "",
-			EnvVar: "BACH_HERE_SCRIPT",
+			EnvVar: "BACH_PRESENT_START",
 			Usage:  "A script / cmd to run when starting your process.",
+		},
+		cli.StringFlag{
+			Name:   "after, a",
+			Value:  "",
+			EnvVar: "BACH_PRESENT_AFTER",
+			Usage:  "A script / cmd to run when finishing your process.",
 		},
 	}
 	return app

@@ -1,14 +1,13 @@
 package bach
 
 import (
-	"fmt"
+	log "github.com/Sirupsen/logrus"
 )
 
-func RunScriptBefore(script string) error {
-	fmt.Printf("Running Script: %s\n", script)
+func RunScript(script string) error {
+	log.Debug("Running Script: ", script)
 
 	if script != "" {
-		fmt.Println(script)
 		cmd := NewCommand(script)
 		err := cmd.Run()
 		if err != nil {
