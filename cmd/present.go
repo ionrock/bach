@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -11,22 +12,51 @@ import (
 
 func ClusterAction(c *cli.Context) error {
 	name := c.Args()[0]
-	ip := ""
+	addr := ""
 	if len(c.Args()) > 1 {
-		ip = c.Args()[1]
+		addr = c.Args()[1]
 	}
 
 	config := bach.LocalConfig(name)
+	if c.Int("port") != 0 {
+		config.BindPort = c.Int("port")
+	}
 
-	config.BindPort = c.Int("port")
+	sm := &bach.ServiceMap{
+		Config:      config,
+		ClusterAddr: addr,
+	}
 
-	bach.InitializeMembership(config, ip)
+	sm.Load()
+	sm.Join()
 
 	log.Printf("Listing on: %s:%d", config.BindAddr, config.BindPort)
-
 	for {
 		time.Sleep(time.Second)
 	}
+	return nil
+}
+
+func ClusterNodesAction(c *cli.Context) error {
+	args := c.Args()
+
+	if len(args) == 0 {
+		log.Fatal("No cluster address provided")
+	}
+	addr := args[0]
+
+	config := bach.LocalConfig("tmp")
+
+	config.LogOutput = ioutil.Discard
+
+	sm := &bach.ServiceMap{
+		Config:      config,
+		ClusterAddr: addr,
+	}
+
+	sm.Join()
+	sm.Sync()
+	sm.CopyJsonTo(os.Stdout)
 
 	return nil
 }
@@ -45,13 +75,18 @@ func GetHereApp() *cli.App {
 	app.Commands = []cli.Command{
 		cli.Command{
 			Name:   "cluster",
-			Usage:  "Connect to / Create a cluster",
+			Usage:  "Manually connect to / create a cluster",
 			Action: ClusterAction,
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name: "port, p",
 				},
 			},
+		},
+		cli.Command{
+			Name:   "nodes",
+			Usage:  "Connect to a cluster and echo a JSON list of members",
+			Action: ClusterNodesAction,
 		},
 	}
 

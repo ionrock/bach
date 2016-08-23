@@ -1,8 +1,10 @@
 package bach
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -41,6 +43,8 @@ func (s *Service) Ip(index int) string {
 }
 
 type ServiceMap struct {
+	Config      *memberlist.Config
+	ClusterAddr string
 	Services    map[string]*Service
 	ServiceList *memberlist.Memberlist
 }
@@ -55,7 +59,7 @@ func (sm ServiceMap) Ip() string {
 	return ""
 }
 
-func (sm ServiceMap) Get(name string) (*Service, error) {
+func (sm *ServiceMap) Get(name string) (*Service, error) {
 	s, ok := sm.Services[name]
 
 	if ok {
@@ -65,42 +69,90 @@ func (sm ServiceMap) Get(name string) (*Service, error) {
 	return nil, errors.New("Missing service")
 }
 
+func (sm *ServiceMap) Load() {
+	list, err := memberlist.Create(sm.Config)
+	if err != nil {
+		panic("Failed to create memberlist: " + err.Error())
+	}
+
+	sm.ServiceList = list
+}
+
+func (sm *ServiceMap) Join() {
+	if sm.ServiceList == nil {
+		sm.Load()
+	}
+
+	// Join an existing cluster by specifying at least one known member.
+	if sm.ClusterAddr != "" {
+		_, err := sm.ServiceList.Join([]string{sm.ClusterAddr})
+		if err != nil {
+			panic("Failed to join cluster: " + err.Error())
+		}
+	}
+}
+
+func (sm *ServiceMap) Leave() {
+	if sm.ServiceList != nil {
+		sm.Leave()
+	}
+}
+
+func (sm *ServiceMap) Sync() {
+
+	if sm.ServiceList == nil {
+		sm.Load()
+	}
+
+	m := make(map[string]*Service)
+
+	// Ask for members of the cluster
+	for _, member := range sm.ServiceList.Members() {
+		parts := strings.Split(member.Name, "-")
+
+		_, ok := m[parts[0]]
+		if !ok {
+			m[parts[0]] = &Service{Name: parts[0]}
+
+		}
+		m[parts[0]].Add(member)
+	}
+
+	sm.Services = m
+}
+
+func (sm *ServiceMap) CopyJsonTo(fh io.Writer) {
+	services := make(map[string]string)
+	localNode := sm.ServiceList.LocalNode()
+
+	for _, n := range sm.Services {
+		hosts := make([]string, len(n.Hosts))
+		for i, h := range n.Hosts {
+			if h != nil && h != localNode {
+				hosts[i] = fmt.Sprintf("%s:%d", h.Addr.String(), h.Port)
+			}
+		}
+		services[strings.ToUpper(n.Name)] = strings.Join(hosts, ", ")
+	}
+
+	doc := ServicesDocument{Services: services}
+	err := json.NewEncoder(fh).Encode(doc)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func LocalConfig(name string) *memberlist.Config {
 	c := memberlist.DefaultLocalConfig()
 	c.Name = fmt.Sprintf("%s-%s", name, c.Name)
 	return c
 }
 
-func InitializeMembership(config *memberlist.Config, memberIp string) ServiceMap {
-	list, err := memberlist.Create(config)
-	if err != nil {
-		panic("Failed to create memberlist: " + err.Error())
-	}
+type ServiceDocument struct {
+	Name      string `json:"NAME"`
+	Addresses string `json:"ADDRESSES"`
+}
 
-	// Join an existing cluster by specifying at least one known member.
-	if memberIp != "" {
-		_, err := list.Join([]string{memberIp})
-		if err != nil {
-			panic("Failed to join cluster: " + err.Error())
-		}
-	}
-
-	sm := make(map[string]*Service)
-
-	// Ask for members of the cluster
-	for _, member := range list.Members() {
-		parts := strings.Split(member.Name, "-")
-
-		_, ok := sm[parts[0]]
-		if !ok {
-			sm[parts[0]] = &Service{Name: parts[0]}
-
-		}
-		sm[parts[0]].Add(member)
-	}
-
-	return ServiceMap{
-		Services:    sm,
-		ServiceList: list,
-	}
+type ServicesDocument struct {
+	Services map[string]string `json:"BACH_SERVICES"`
 }
