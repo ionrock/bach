@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -9,19 +8,7 @@ import (
 )
 
 func RunScriptBefore(c *cli.Context) error {
-	script := c.String("script")
-	fmt.Printf("Running Script: %s\n", script)
-
-	if script != "" {
-		fmt.Println(script)
-		cmd := bach.NewCommand(script)
-		err := cmd.Run()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return bach.RunScriptBefore(c.String("script"))
 }
 
 func GetHereApp() *cli.App {
