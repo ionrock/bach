@@ -8,8 +8,6 @@ necessary to support legacy applications on a modern cloud / container
 base platform.
 
 
-
-
 Withenv
 -------
 
@@ -50,6 +48,45 @@ $ DBURL=db.example.com toconfig \
 	startdb
 ```
 
+Present
+-------
+
+Present allows running a script before a process starts and another
+when it finishes. For example, if you wanted to start up some process
+like `etcd` before starting our app, you could write a small bash
+script that starts it and stops when the program exits.
+
+```bash
+$ present --start dbstart.sh --after dbkill.sh myapp
+```
+
+Present can be used as a simple cluster management system. Present can
+utilize a
+[gossip protocol](http://www.cs.cornell.edu/%7Easdas/research/dsn02-swim.pdf)
+to communicate between the cluster. This doesn't require a data store,
+so it may not be viable for some applications, but for simple service
+discovery, it should work well.
+
+```bash
+$ $SOME_CLUSTER_ADDRESS=172.18.0.4:7001 we -s 'present nodes $SOME_CLUSTER_ADDRESS' \
+    toconfig -t my.conf.tmpl -s my.conf myapp
+```
+
+The `present nodes` command can find the nodes in the cluster and
+print a JSON file. Withenv can then read the result, add it to the
+enviornment, at which point, toconfig can write values in the config
+file.
+
+To join the cluster, you can use the default command.
+
+```bash
+$ present join --name appserver --cluster-addr 172.18.0.4 myapp
+```
+
+This joins the cluster with the service name of `appserver` that can
+be used by other cluster members to discover the service. At this
+point there is nothing in place to do things like register specific
+ports, dns lookups or anything else terribly special.
 
 Why?
 ---
