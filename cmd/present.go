@@ -55,13 +55,21 @@ func ClusterNodesAction(c *cli.Context) error {
 	}
 
 	sm.Join()
-	sm.Sync()
 	sm.CopyJsonTo(os.Stdout)
 
 	return nil
 }
 
 func RunScriptBefore(c *cli.Context) error {
+	if c.String("name") != "" && c.String("cluster-addr") != "" {
+		config := bach.LocalConfig(c.String("name"))
+		sm := &bach.ServiceMap{
+			Config:      config,
+			ClusterAddr: c.String("cluster-addr"),
+		}
+		sm.Join()
+	}
+
 	return bach.RunScript(c.String("start"))
 }
 
@@ -105,6 +113,16 @@ func GetHereApp() *cli.App {
 			Value:  "",
 			EnvVar: "BACH_PRESENT_AFTER",
 			Usage:  "A script / cmd to run when finishing your process.",
+		},
+		cli.StringFlag{
+			Name:  "name, n",
+			Value: "",
+			Usage: "The name of an app to a cluster",
+		},
+		cli.StringFlag{
+			Name:  "cluster-addr, c",
+			Value: "",
+			Usage: "The address of another node in the cluster",
 		},
 	}
 	return app

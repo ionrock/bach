@@ -80,7 +80,7 @@ file.
 To join the cluster, you can use the default command.
 
 ```bash
-$ present join --name appserver --cluster-addr 172.18.0.4 myapp
+$ present --name appserver --cluster-addr 172.18.0.4 myapp
 ```
 
 This joins the cluster with the service name of `appserver` that can

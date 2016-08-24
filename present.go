@@ -69,16 +69,17 @@ func (sm *ServiceMap) Get(name string) (*Service, error) {
 	return nil, errors.New("Missing service")
 }
 
-func (sm *ServiceMap) Load() {
+func (sm *ServiceMap) Load() *ServiceMap {
 	list, err := memberlist.Create(sm.Config)
 	if err != nil {
 		panic("Failed to create memberlist: " + err.Error())
 	}
 
 	sm.ServiceList = list
+	return sm
 }
 
-func (sm *ServiceMap) Join() {
+func (sm *ServiceMap) Join() *ServiceMap {
 	if sm.ServiceList == nil {
 		sm.Load()
 	}
@@ -89,17 +90,21 @@ func (sm *ServiceMap) Join() {
 		if err != nil {
 			panic("Failed to join cluster: " + err.Error())
 		}
+
+		sm.Sync()
 	}
+
+	return sm
 }
 
-func (sm *ServiceMap) Leave() {
+func (sm *ServiceMap) Leave() *ServiceMap {
 	if sm.ServiceList != nil {
 		sm.Leave()
 	}
+	return sm
 }
 
-func (sm *ServiceMap) Sync() {
-
+func (sm *ServiceMap) Sync() *ServiceMap {
 	if sm.ServiceList == nil {
 		sm.Load()
 	}
@@ -119,6 +124,12 @@ func (sm *ServiceMap) Sync() {
 	}
 
 	sm.Services = m
+
+	return sm
+}
+
+func (sm *ServiceMap) AsJson() {
+
 }
 
 func (sm *ServiceMap) CopyJsonTo(fh io.Writer) {
