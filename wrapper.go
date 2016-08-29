@@ -75,13 +75,17 @@ func NewCommand(script string) *exec.Cmd {
 
 func CommandAction(c *cli.Context) error {
 	args := c.Args()
-	parts := make([]string, len(args))
 
-	for i, arg := range args {
-		parts[i] = os.ExpandEnv(arg)
+	if len(args) > 0 {
+		parts := make([]string, len(args))
+
+		for i, arg := range args {
+			parts[i] = os.ExpandEnv(arg)
+		}
+		return RunWrapped(parts...)
 	}
 
-	return RunWrapped(parts...)
+	return nil
 }
 
 type Procs struct {
