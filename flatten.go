@@ -85,7 +85,7 @@ func (f Flattener) loadMap(b []byte) ([]map[string]interface{}, error) {
 
 	err := f.unmarshal(b, &m)
 	if err != nil {
-		log.Error(err)
+		log.Debug(err)
 		return nil, err
 	}
 
@@ -98,7 +98,7 @@ func (f Flattener) loadList(b []byte) ([]map[string]interface{}, error) {
 
 	err := f.unmarshal(b, &m)
 	if err != nil {
-		log.Error(err)
+		log.Debug(err)
 		return nil, err
 	}
 
@@ -116,7 +116,7 @@ func (f Flattener) load(path string) ([]map[string]interface{}, error) {
 		return m, err
 	}
 
-	log.Errorf("Error parsing %s as an object", path)
+	log.Debugf("Error parsing %s as an object", path)
 
 	m, err = f.loadList(b)
 	if err != nil {
