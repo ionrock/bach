@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -139,15 +140,16 @@ func (f Flattener) flattenEnv(env []map[string]interface{}) map[string]string {
 
 func (f Flattener) flattenMap(env map[string]string, ev map[string]interface{}, prefix []string) map[string]string {
 	for k, v := range ev {
-		switch t := v.(type) {
+		switch v.(type) {
 		case string:
 			key := flatKey(prefix, k)
-			env[key] = v.(string)
+			env[key] = os.ExpandEnv(v.(string))
 		case map[string]interface{}:
 			f.flattenMap(env, v.(map[string]interface{}), append(prefix, k))
 		default:
-			log.Debug("Prefix: ", prefix)
-			log.Debugf("Default: %#v", t)
+			key := flatKey(prefix, k)
+			log.Printf("key : %s", key)
+			env[key] = fmt.Sprintf("%v", v)
 		}
 	}
 
