@@ -2,6 +2,7 @@ package bach
 
 import (
 	"os"
+	"path/filepath"
 	"text/template"
 )
 
@@ -11,11 +12,17 @@ type TmplData struct {
 
 func ApplyConfig(t string, c string) error {
 
+	t, err := filepath.Abs(t)
+	if err != nil {
+		panic(err)
+	}
+	name := filepath.Base(t)
+
 	funcMap := template.FuncMap{
 		"Get": os.Getenv,
 	}
 
-	tmpl, err := template.New(t).Funcs(funcMap).ParseFiles(t)
+	tmpl, err := template.New(name).Funcs(funcMap).ParseFiles(t)
 	if err != nil {
 		panic(err)
 	}
