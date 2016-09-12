@@ -16,10 +16,10 @@ DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 all: present we toconfig cluster
 
 present: $(SOURCES)
-	go build -o present ${LDFLAGS} cmd/present.go
+	go build -o present ${LDFLAGS} ./cmd/present/
 
 cluster: $(SOURCES)
-	go build -o cluster ${LDFLAGS} cmd/cluster.go
+	go build -o cluster ${LDFLAGS} ./cmd/cluster/
 
 
 clean:
@@ -31,13 +31,13 @@ present-example: present
 
 
 we: $(SOURCES)
-	go build -o we ${LDFLAGS} cmd/we.go
+	go build -o we ${LDFLAGS} ./cmd/we/
 
 we-example: we
 	./we -e example_env.yml echo 'Hello World!'
 
 toconfig: $(SOURCES)
-	go build -o toconfig ${LDFLAGS} cmd/toconfig.go
+	go build -o toconfig ${LDFLAGS} ./cmd/toconfig/
 
 toconfig-example: toconfig
 	./toconfig -t example.conf.tmpl -c example.conf cat example.conf

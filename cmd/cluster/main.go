@@ -87,7 +87,7 @@ func LeaveClusterAfter(c *cli.Context) error {
 	return nil
 }
 
-func GetHereApp() *cli.App {
+func GetClusterApp() *cli.App {
 	app := cli.NewApp()
 
 	app.Commands = []cli.Command{
@@ -129,6 +129,6 @@ func GetHereApp() *cli.App {
 }
 
 func main() {
-	app := GetHereApp()
+	app := GetClusterApp()
 	app.Run(os.Args)
 }
