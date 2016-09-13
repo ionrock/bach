@@ -17,19 +17,21 @@ type EnvVar struct {
 	field string
 }
 
-func (e EnvVar) Apply() (env map[string]string) {
+func (e EnvVar) Apply() map[string]string {
 	parts := strings.Split(e.field, "=")
 	if len(parts) != 2 {
 		log.Fatal("Invalid env var format. Use %s=%s")
 	}
 	key := parts[0]
 	value := parts[1]
+
+	env := make(map[string]string)
 	env[key] = value
 
-	log.Debugf("export %s = %s", key, value)
+	log.Debugf("export %s=%s", key, value)
 	err := os.Setenv(key, value)
 	if err != nil {
-		log.Fatal(err)		
+		log.Fatal(err)
 	}
 	return env
 }
@@ -125,7 +127,7 @@ func WithEnv(args []string) error {
 			log.Debug("Applying single var: ", f)
 			action := EnvVar{field: f}
 			action.Apply()
-			in_flag = ""			
+			in_flag = ""
 
 		default:
 			break
