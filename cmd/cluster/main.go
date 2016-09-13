@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -77,11 +76,12 @@ func JoinClusterBefore(c *cli.Context) error {
 }
 
 func LeaveClusterAfter(c *cli.Context) error {
-	fmt.Println("Leaving!!!")
-	err := sm.Leave()
+	if sm != nil {
+		err := sm.Leave()
 
-	if err != nil {
-		log.Fatal(err)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	return nil
