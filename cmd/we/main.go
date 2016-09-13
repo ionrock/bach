@@ -25,27 +25,29 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringSliceFlag{
 			Name:  "env, e",
-			Usage: "A YAML file to include in the environment.",
-		},
-
-		cli.StringSliceFlag{
-			Name:  "envvar, E",
-			Usage: "Override a single environment variable.",
+			Usage: "A YAML/JSON file to include in the environment.",
 		},
 
 		cli.StringSliceFlag{
 			Name:  "script, s",
 			Usage: "Execute a script that outputs YAML.",
 		},
+
 		cli.StringFlag{
 			Name:  "directory, d",
 			Value: "",
 			Usage: "A directory containing YAML files to recursively applyt to the environment.",
 		},
+
 		cli.StringFlag{
 			Name:  "alias, a",
 			Value: "",
 			Usage: "A YAML file containing a list of file/directory entries to apply to the environment.",
+		},
+
+		cli.StringSliceFlag{
+			Name:  "envvar, E",
+			Usage: "Override a single environment variable.",
 		},
 
 		cli.BoolFlag{

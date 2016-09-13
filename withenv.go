@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -72,6 +73,47 @@ func (e EnvFile) Apply() map[string]string {
 	return env
 }
 
+type EnvDir struct {
+	path string
+}
+
+func (e EnvDir) Files() chan string {
+	files := make(chan string)
+
+	go func() {
+		extensions := []string{"yaml", "yml", "json"}
+
+		filepath.Walk(e.path, func(path string, f os.FileInfo, err error) error {
+			if !f.IsDir() {
+				for _, ext := range extensions {
+					if strings.HasSuffix(path, ext) {
+						files <- path
+					}
+				}
+			}
+			return nil
+		})
+
+		close(files)
+	}()
+
+	return files
+}
+
+func (e EnvDir) Apply() map[string]string {
+	env := make(map[string]string)
+
+	for fn := range e.Files() {
+		ef := EnvFile{fn}
+		update := ef.Apply()
+		for k, v := range update {
+			env[k] = v
+		}
+	}
+
+	return env
+}
+
 type EnvScript struct {
 	cmd string
 }
@@ -126,6 +168,14 @@ func WithEnv(args []string) error {
 		case in_flag == "envvar":
 			log.Debug("Applying single var: ", f)
 			action := EnvVar{field: f}
+			action.Apply()
+			in_flag = ""
+
+		case f == "--directory" || f == "-d":
+			in_flag = "directory"
+		case in_flag == "directory":
+			log.Debug("Applying directory: ", f)
+			action := EnvDir{path: f}
 			action.Apply()
 			in_flag = ""
 
