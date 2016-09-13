@@ -4,12 +4,34 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 )
 
 type Action interface {
 	Apply() map[string]string
+}
+
+type EnvVar struct {
+	field string
+}
+
+func (e EnvVar) Apply() (env map[string]string) {
+	parts := strings.Split(e.field, "=")
+	if len(parts) != 2 {
+		log.Fatal("Invalid env var format. Use %s=%s")
+	}
+	key := parts[0]
+	value := parts[1]
+	env[key] = value
+
+	log.Debugf("export %s = %s", key, value)
+	err := os.Setenv(key, value)
+	if err != nil {
+		log.Fatal(err)		
+	}
+	return env
 }
 
 type EnvFile struct {
@@ -78,11 +100,13 @@ func (e EnvScript) Apply() map[string]string {
 func WithEnv(args []string) error {
 	in_flag := ""
 	for _, f := range args {
+		log.Debugf("default: %s", f)
+
 		switch {
 		case f == "--env" || f == "-e":
 			in_flag = "env"
 		case in_flag == "env":
-			log.Debug("Applying  env: ", f)
+			log.Debug("Applying env: ", f)
 			action := EnvFile{path: f}
 			action.Apply()
 			in_flag = ""
@@ -94,6 +118,14 @@ func WithEnv(args []string) error {
 			action := EnvScript{cmd: f}
 			action.Apply()
 			in_flag = ""
+
+		case f == "--envvar" || f == "-E":
+			in_flag = "envvar"
+		case in_flag == "envvar":
+			log.Debug("Applying single var: ", f)
+			action := EnvVar{field: f}
+			action.Apply()
+			in_flag = ""			
 
 		default:
 			break

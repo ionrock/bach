@@ -20,6 +20,8 @@ func main() {
 	app.Usage = "Add environment variables via YAML or scripts before running a command."
 	app.Before = WeBefore
 	app.Action = bach.CommandAction
+
+	// NOTE: These flags are essentially ignored b/c we need ordered flags
 	app.Flags = []cli.Flag{
 		cli.StringSliceFlag{
 			Name:  "env, e",
@@ -35,17 +37,16 @@ func main() {
 			Name:  "script, s",
 			Usage: "Execute a script that outputs YAML.",
 		},
-
-		// cli.StringFlag{
-		// 	Name:  "directory, d",
-		// 	Value: "",
-		// 	Usage: "A directory containing YAML files to recursively applyt to the environment.",
-		// },
-		// cli.StringFlag{
-		// 	Name:  "alias, a",
-		// 	Value: "",
-		// 	Usage: "A YAML file containing a list of file/directory entries to apply to the environment.",
-		// },
+		cli.StringFlag{
+			Name:  "directory, d",
+			Value: "",
+			Usage: "A directory containing YAML files to recursively applyt to the environment.",
+		},
+		cli.StringFlag{
+			Name:  "alias, a",
+			Value: "",
+			Usage: "A YAML file containing a list of file/directory entries to apply to the environment.",
+		},
 
 		cli.BoolFlag{
 			Name:  "debug, D",
