@@ -15,6 +15,9 @@ DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
 all: present we toconfig cluster
 
+install:
+	go install ./cmd/...
+
 present: $(SOURCES)
 	go build -o present ${LDFLAGS} ./cmd/present/
 
