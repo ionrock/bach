@@ -141,6 +141,14 @@ func (e EnvScript) Apply() map[string]string {
 	return ef.Apply()
 }
 
+type EnvAlias struct {
+	path string
+}
+
+func (e EnvAlias) Apply() map[string]string {
+
+}
+
 func WithEnv(args []string) error {
 	in_flag := ""
 	for _, f := range args {
@@ -176,6 +184,14 @@ func WithEnv(args []string) error {
 		case in_flag == "directory":
 			log.Debug("Applying directory: ", f)
 			action := EnvDir{path: f}
+			action.Apply()
+			in_flag = ""
+
+		case f == "--alias" || f == "-a":
+			in_flag = "alias"
+		case in_flag == "alias":
+			log.Debug("Applying alias: ", f)
+			action := EnvAlias{path: f}
 			action.Apply()
 			in_flag = ""
 
