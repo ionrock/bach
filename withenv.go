@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/ghodss/yaml"
 )
 
 type Action interface {
@@ -145,8 +146,57 @@ type EnvAlias struct {
 	path string
 }
 
+type AliasItem struct {
+	File      string `json:"file"`
+	Env       string `json:"env"`
+	Directory string `json:"directory"`
+	Script    string `json:"script"`
+	EnvVar    string `json:"envvar"`
+}
+
+func (a AliasItem) GetArgs(args []string) []string {
+	switch {
+	case a.File != "":
+		args = append(args, "--env", a.File)
+	case a.Env != "":
+		args = append(args, "--env", a.Env)
+	case a.Directory != "":
+		args = append(args, "--directory", a.Directory)
+	case a.Script != "":
+		args = append(args, "--script", a.Script)
+	case a.EnvVar != "":
+		args = append(args, "--envvar", a.EnvVar)
+	}
+	return args
+}
+
 func (e EnvAlias) Apply() map[string]string {
 
+	log.Debug("Reading: ", e.path)
+	b, err := ioutil.ReadFile(e.path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	entries := []AliasItem{}
+
+	yaml.Unmarshal(b, &entries)
+
+	args := []string{}
+
+	for _, e := range entries {
+		args = e.GetArgs(args)
+	}
+
+	log.Debug("Loaded alias with: ", args)
+
+	err = WithEnv(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	env := make(map[string]string)
+	return env
 }
 
 func WithEnv(args []string) error {
