@@ -1,6 +1,7 @@
 package bach
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -30,7 +31,6 @@ func (e EnvVar) Apply() map[string]string {
 	env := make(map[string]string)
 	env[key] = value
 
-	log.Debugf("export %s=%s", key, value)
 	err := os.Setenv(key, value)
 	if err != nil {
 		log.Fatal(err)
@@ -64,7 +64,6 @@ func (e EnvFile) Apply() map[string]string {
 	}
 
 	for k, v := range env {
-		log.Debugf("export %s=%s", k, v)
 		err = os.Setenv(k, v)
 		if err != nil {
 			panic(err)
@@ -106,10 +105,7 @@ func (e EnvDir) Apply() map[string]string {
 
 	for fn := range e.Files() {
 		ef := EnvFile{fn}
-		update := ef.Apply()
-		for k, v := range update {
-			env[k] = v
-		}
+		env = updateEnvMap(env, ef.Apply())
 	}
 
 	return env
@@ -146,30 +142,6 @@ type EnvAlias struct {
 	path string
 }
 
-type AliasItem struct {
-	File      string `json:"file"`
-	Env       string `json:"env"`
-	Directory string `json:"directory"`
-	Script    string `json:"script"`
-	EnvVar    string `json:"envvar"`
-}
-
-func (a AliasItem) GetArgs(args []string) []string {
-	switch {
-	case a.File != "":
-		args = append(args, "--env", a.File)
-	case a.Env != "":
-		args = append(args, "--env", a.Env)
-	case a.Directory != "":
-		args = append(args, "--directory", a.Directory)
-	case a.Script != "":
-		args = append(args, "--script", a.Script)
-	case a.EnvVar != "":
-		args = append(args, "--envvar", a.EnvVar)
-	}
-	return args
-}
-
 func (e EnvAlias) Apply() map[string]string {
 
 	log.Debug("Reading: ", e.path)
@@ -178,28 +150,43 @@ func (e EnvAlias) Apply() map[string]string {
 		log.Fatal(err)
 	}
 
-	entries := []AliasItem{}
+	entries := make([]map[string]string, 0)
 
 	yaml.Unmarshal(b, &entries)
 
 	args := []string{}
 
 	for _, e := range entries {
-		args = e.GetArgs(args)
+		for k, v := range e {
+			if k == "file" {
+				args = append(args, "--env", v)
+			} else {
+				args = append(args, fmt.Sprintf("--%s", k), v)
+			}
+		}
 	}
 
 	log.Debug("Loaded alias with: ", args)
 
-	err = WithEnv(args)
+	env, err := WithEnv(args)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	env := make(map[string]string)
 	return env
 }
 
-func WithEnv(args []string) error {
+func updateEnvMap(cur, env map[string]string) map[string]string {
+	for k, v := range env {
+		cur[k] = v
+	}
+	return cur
+}
+
+func WithEnv(args []string) (map[string]string, error) {
+
+	env := make(map[string]string)
+
 	in_flag := ""
 	for _, f := range args {
 		log.Debugf("default: %s", f)
@@ -210,7 +197,7 @@ func WithEnv(args []string) error {
 		case in_flag == "env":
 			log.Debug("Applying env: ", f)
 			action := EnvFile{path: f}
-			action.Apply()
+			env = updateEnvMap(env, action.Apply())
 			in_flag = ""
 
 		case f == "--script" || f == "-s":
@@ -218,7 +205,7 @@ func WithEnv(args []string) error {
 		case in_flag == "script":
 			log.Debug("Applying script: ", f)
 			action := EnvScript{cmd: f}
-			action.Apply()
+			env = updateEnvMap(env, action.Apply())
 			in_flag = ""
 
 		case f == "--envvar" || f == "-E":
@@ -226,7 +213,7 @@ func WithEnv(args []string) error {
 		case in_flag == "envvar":
 			log.Debug("Applying single var: ", f)
 			action := EnvVar{field: f}
-			action.Apply()
+			env = updateEnvMap(env, action.Apply())
 			in_flag = ""
 
 		case f == "--directory" || f == "-d":
@@ -234,7 +221,7 @@ func WithEnv(args []string) error {
 		case in_flag == "directory":
 			log.Debug("Applying directory: ", f)
 			action := EnvDir{path: f}
-			action.Apply()
+			env = updateEnvMap(env, action.Apply())
 			in_flag = ""
 
 		case f == "--alias" || f == "-a":
@@ -242,7 +229,7 @@ func WithEnv(args []string) error {
 		case in_flag == "alias":
 			log.Debug("Applying alias: ", f)
 			action := EnvAlias{path: f}
-			action.Apply()
+			env = updateEnvMap(env, action.Apply())
 			in_flag = ""
 
 		default:
@@ -250,5 +237,5 @@ func WithEnv(args []string) error {
 		}
 	}
 
-	return nil
+	return env, nil
 }

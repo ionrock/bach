@@ -10,8 +10,14 @@ import (
 
 func WeBefore(c *cli.Context) error {
 	bach.InitLogging(c.Bool("debug"))
-	log.Info("args: ", os.Args[1:])
-	return bach.WithEnv(os.Args[1:])
+	log.Debug("args: ", os.Args[1:])
+	env, err := bach.WithEnv(os.Args[1:])
+
+	log.Debug("Computed Env")
+	for k, v := range env {
+		log.Debugf("export %s=%s", k, v)
+	}
+	return err
 }
 
 func main() {
