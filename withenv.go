@@ -142,17 +142,7 @@ type EnvAlias struct {
 	path string
 }
 
-func (e EnvAlias) Apply() map[string]string {
-
-	log.Debug("Reading: ", e.path)
-	b, err := ioutil.ReadFile(e.path)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	entries := make([]map[string]string, 0)
-
-	yaml.Unmarshal(b, &entries)
+func (e EnvAlias) ApplyFromMap(entries []map[string]string) (map[string]string, error) {
 
 	args := []string{}
 
@@ -168,7 +158,21 @@ func (e EnvAlias) Apply() map[string]string {
 
 	log.Debug("Loaded alias with: ", args)
 
-	env, err := WithEnv(args)
+	return WithEnv(args)
+}
+
+func (e EnvAlias) Apply() map[string]string {
+	log.Debug("Reading: ", e.path)
+	b, err := ioutil.ReadFile(e.path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	entries := make([]map[string]string, 0)
+
+	yaml.Unmarshal(b, &entries)
+
+	env, err := e.ApplyFromMap(entries)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -189,8 +193,6 @@ func WithEnv(args []string) (map[string]string, error) {
 
 	in_flag := ""
 	for _, f := range args {
-		log.Debugf("default: %s", f)
-
 		switch {
 		case f == "--env" || f == "-e":
 			in_flag = "env"

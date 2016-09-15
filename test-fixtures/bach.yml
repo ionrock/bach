@@ -1,0 +1,8 @@
+---
+
+- withenv:
+  - envvar: FOO=baz
+
+- toconfig:
+    template: test-fixtures/example.conf.tmpl
+    config: /tmp/example.conf

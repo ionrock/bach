@@ -1,0 +1,10 @@
+---
+- withenv:
+  - file: test-fixtures/example_env.yml
+  - directory: test-fixtures/envs
+  - script: cat test-fixtures/example.json
+  - envvar: FOO=BAR
+
+- toconfig:
+    template: test-fixtures/example.conf.tmpl
+    config: out.txt

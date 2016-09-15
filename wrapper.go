@@ -6,8 +6,8 @@ import (
 	"os/exec"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/codegangsta/cli"
 	"github.com/flynn/go-shlex"
+	"github.com/urfave/cli"
 )
 
 func RunLogged(parts ...string) error {

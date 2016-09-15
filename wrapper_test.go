@@ -3,7 +3,7 @@ package bach
 import (
 	"testing"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func TestNewWrapper(t *testing.T) {

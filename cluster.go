@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	// log "github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/hashicorp/memberlist"
 )
 
@@ -59,9 +59,8 @@ func (sm *ServiceMap) Get(name string) (*Service, error) {
 func (sm *ServiceMap) Load() *ServiceMap {
 	list, err := memberlist.Create(sm.Config)
 	if err != nil {
-		panic("Failed to create memberlist: " + err.Error())
+		log.Error(err)
 	}
-
 	sm.ServiceList = list
 	return sm
 }
@@ -128,6 +127,7 @@ func (sm *ServiceMap) AsJson() {
 
 func (sm *ServiceMap) CopyJsonTo(fh io.Writer) {
 	services := make(map[string]string)
+	names := []string{}
 	localNode := sm.ServiceList.LocalNode()
 
 	for _, n := range sm.Services {
@@ -137,10 +137,12 @@ func (sm *ServiceMap) CopyJsonTo(fh io.Writer) {
 				hosts[i] = fmt.Sprintf("%s:%d", h.Addr.String(), h.Port)
 			}
 		}
-		services[strings.ToUpper(n.Name)] = strings.Join(hosts, ", ")
+		sname := strings.ToUpper(n.Name)
+		services[sname] = strings.Join(hosts, ", ")
+		names = append(names, sname)
 	}
 
-	doc := ServicesDocument{Services: services}
+	doc := ServicesDocument{Services: services, Names: strings.Join(names, " ")}
 	err := json.NewEncoder(fh).Encode(doc)
 	if err != nil {
 		panic(err)
@@ -148,7 +150,7 @@ func (sm *ServiceMap) CopyJsonTo(fh io.Writer) {
 }
 
 func LocalConfig(name string) *memberlist.Config {
-	c := memberlist.DefaultLocalConfig()
+	c := memberlist.DefaultLANConfig()
 	c.Name = fmt.Sprintf("%s-%s", name, c.Name)
 	return c
 }
@@ -160,4 +162,5 @@ type ServiceDocument struct {
 
 type ServicesDocument struct {
 	Services map[string]string `json:"BACH_SERVICES"`
+	Names    string            `json:"BACK_ALL_SERVICES"`
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/ionrock/bach"
+	"github.com/urfave/cli"
 )
 
 func RunScriptBefore(c *cli.Context) error {

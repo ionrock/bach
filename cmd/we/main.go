@@ -4,8 +4,8 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/codegangsta/cli"
 	"github.com/ionrock/bach"
+	"github.com/urfave/cli"
 )
 
 func WeBefore(c *cli.Context) error {

@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func CleanScript(filename string) {

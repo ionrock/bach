@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/ionrock/bach"
+	"github.com/urfave/cli"
 )
 
 func ClusterAction(c *cli.Context) error {
@@ -102,9 +102,10 @@ func GetClusterApp() *cli.App {
 			},
 		},
 		cli.Command{
-			Name:   "nodes",
-			Usage:  "Connect to a cluster and echo a JSON list of members",
-			Action: ClusterNodesAction,
+			Name:      "nodes",
+			Usage:     "Connect to a cluster and echo a JSON list of members",
+			ArgsUsage: "[CLUSTER_ADDRESS]",
+			Action:    ClusterNodesAction,
 		},
 	}
 
