@@ -1,0 +1,10 @@
+language: go
+
+go:
+  - tip
+
+# deploy:
+#   provider: releases
+#   skip_cleanup: true
+#   on:
+#     tags: true
