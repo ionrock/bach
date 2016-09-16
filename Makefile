@@ -19,14 +19,14 @@ DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
 GLIDE=$(GOPATH)/bin/glide
 
-$(GLIDE):
-	go get github.com/Masterminds/glide
-	glide i
+install: $(GLIDE)
+	go install ./cmd/...
 
 all: $(BINDIR)/present $(BINDIR)/we $(BINDIR)/toconfig $(BINDIR)/cluster
 
-install: $(GLIDE)
-	go install ./cmd/...
+$(GLIDE):
+	go get github.com/Masterminds/glide
+	glide i
 
 $(BINDIR)/present: $(SOURCES)
 	go build -o $(BINDIR)/present ${LDFLAGS} ./cmd/present/
