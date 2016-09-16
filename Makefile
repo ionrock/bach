@@ -17,9 +17,15 @@ DOCKER_MACHINE_NAME=default
 DOCKER_PREP=eval `docker-machine env $(DOCKER_MACHINE_NAME)`
 DOCKER_IP=`docker-machine ip $(DOCKER_MACHINE_NAME)`
 
+GLIDE=$(GOPATH)/bin/glide
+
+$(GLIDE):
+	go get github.com/Masterminds/glide
+	glide i
+
 all: $(BINDIR)/present $(BINDIR)/we $(BINDIR)/toconfig $(BINDIR)/cluster
 
-install:
+install: $(GLIDE)
 	go install ./cmd/...
 
 $(BINDIR)/present: $(SOURCES)
