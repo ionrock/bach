@@ -3,6 +3,11 @@ language: go
 go:
   - 1.7
 
+install: make install
+
+script: go test ./...
+
+
 # deploy:
 #   provider: releases
 #   skip_cleanup: true
