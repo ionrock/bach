@@ -5,8 +5,6 @@ SOURCES := $(shell find $(SOURCEDIR) -path ./docker -prune -o -name '*.go')
 
 BINDIR=bin
 
-LINBUILD=-linux-amd64
-
 VERSION=1.0.0
 BUILD_TIME=`date +%FT%T%z`
 
@@ -28,20 +26,20 @@ $(GLIDE):
 	go get github.com/Masterminds/glide
 	glide i
 
-$(BINDIR)/present: $(SOURCES)
-	go build -o $(BINDIR)/present ${LDFLAGS} ./cmd/present/
+$(BINDIR)/present-$(GOOS)-$(GOARCH): $(SOURCES)
+	go build -o $(BINDIR)/present-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/present/
 
-$(BINDIR)/cluster: $(SOURCES)
-	go build -o $(BINDIR)/cluster ${LDFLAGS} ./cmd/cluster/
+$(BINDIR)/cluster-$(GOOS)-$(GOARCH): $(SOURCES)
+	go build -o $(BINDIR)/cluster-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/cluster/
 
-$(BINDIR)/we: $(SOURCES)
-	go build -o $(BINDIR)/we ${LDFLAGS} ./cmd/we/
+$(BINDIR)/we-$(GOOS)-$(GOARCH): $(SOURCES)
+	go build -o $(BINDIR)/we-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/we/
 
-$(BINDIR)/toconfig: $(SOURCES)
-	go build -o $(BINDIR)/toconfig ${LDFLAGS} ./cmd/toconfig/
+$(BINDIR)/toconfig-$(GOOS)-$(GOARCH): $(SOURCES)
+	go build -o $(BINDIR)/toconfig-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/toconfig/
 
-$(BINDIR)/bach: $(SOURCES)
-	go build -o $(BINDIR)/bach ${LDFLAGS} ./cmd/bach/
+$(BINDIR)/bach-$(GOOS)-$(GOARCH): $(SOURCES)
+	go build -o $(BINDIR)/bach-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/bach/
 
 
 clean:
@@ -67,3 +65,5 @@ build-example:
 	GOOS=linux GOARCH=amd64 go build -o example/bach     ${LDFLAGS} ./cmd/bach/
 
 	docker-compose -f example/docker-compose.yml build
+
+release:
