@@ -1,7 +1,7 @@
 language: go
 go:
 - 1.7
-install: make install
+install: make build-all
 script: go test
 deploy:
   skip_cleanup: true
@@ -30,5 +30,4 @@ deploy:
   on:
     repo: ionrock/bach
     tags: true
-    branches:
-      - master
+    branch: master
