@@ -28,3 +28,6 @@ deploy:
     - we-windows-amd64
   on:
     repo: ionrock/bach
+    tags: true
+    branches:
+      - master
