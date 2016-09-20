@@ -9,24 +9,24 @@ deploy:
   api_key:
     secure: 2LIqcZk8hzS+JGP953cbtrLjh6YwJ+q3cW9XQOUYlwnia/e+JkUeZcRNhq/AUlHqPMGmHFHMIJYgz1NW+5c5y78BBmpiHCsyh9H35kognHw+Td4ACact3jtCKuPgXALFvan6rXNwqjSBVmVX9W68EQPvBV9yHxjfV5Pb2hqcQ8BVim7Vb6pAQU56RVrLv+4UbpMFfhj942mH8iDQSem3pDYyLYioh+B2LuylQ34eISpaOKmySuuF+/NSk24QKSyU8nIbdM36JafNjaWY6cZAtY4Zzbfoii4cKkTfzwLc3JSNU3dfhjHRWEbUI/taALtu1Y0PsKterMgvlXO5kGl8duwLA2UdYuDpewjPV81+FcYO0ZIRXo9F2lRIGLWXi7aic+mNeNR0Akbsv5My8Fa51eiX4DQvPmU1lLdJgeXiu+WJeBDFPgIgByJRebomf78BCKThLIkSL1VOXOonNM20D1xafIns8KplEKgNDK8e9hJ5VQl94eaqJZK9q5Pavf4wgPqoC638wbKYCBjO34Th93KAGdiliqmoSccHR9xMxejyCHJzD5ohIBIHX4ti5VaFcJ1p7idpLMth3FH1Q26Yc+qVGA4sVmoV7aGYHwBh39S4ncITnqGSlpFPdxrYnysU/JMjU+RslmsUZp6Rw+6wTvQpBJj0tCztNZ6atI9ITt4=
   file:
-    - bach-darwin-386
-    - bach-darwin-amd64
-    - bach-linux-386
-    - bach-linux-amd64
-    - bach-windows-386
-    - bach-windows-amd64
-    - toconfig-darwin-386
-    - toconfig-darwin-amd64
-    - toconfig-linux-386
-    - toconfig-linux-amd64
-    - toconfig-windows-386
-    - toconfig-windows-amd64
-    - we-darwin-386
-    - we-darwin-amd64
-    - we-linux-386
-    - we-linux-amd64
-    - we-windows-386
-    - we-windows-amd64
+    - bin/bach-darwin-386
+    - bin/bach-darwin-amd64
+    - bin/bach-linux-386
+    - bin/bach-linux-amd64
+    - bin/bach-windows-386
+    - bin/bach-windows-amd64
+    - bin/toconfig-darwin-386
+    - bin/toconfig-darwin-amd64
+    - bin/toconfig-linux-386
+    - bin/toconfig-linux-amd64
+    - bin/toconfig-windows-386
+    - bin/toconfig-windows-amd64
+    - bin/we-darwin-386
+    - bin/we-darwin-amd64
+    - bin/we-linux-386
+    - bin/we-linux-amd64
+    - bin/we-windows-386
+    - bin/we-windows-amd64
   on:
     repo: ionrock/bach
     tags: true
