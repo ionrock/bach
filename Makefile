@@ -66,4 +66,13 @@ build-example:
 
 	docker-compose -f example/docker-compose.yml build
 
-release:
+build-all: $(SOURCES)
+	for CLIAPP in we toconfig bach ; do \
+	  for GOOS in linux darwin windows ; do \
+	    for GOARCH in amd64 386 ; do \
+	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/we-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
+	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/toconfig-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
+	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/bach-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
+	    done \
+	  done \
+	done
