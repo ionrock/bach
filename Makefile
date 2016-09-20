@@ -66,7 +66,8 @@ build-example:
 
 	docker-compose -f example/docker-compose.yml build
 
-build-all: $(SOURCES)
+build-all: $(GLIDE) $(SOURCES)
+	glide i
 	for CLIAPP in we toconfig bach ; do \
 	  for GOOS in linux darwin windows ; do \
 	    for GOARCH in amd64 386 ; do \
