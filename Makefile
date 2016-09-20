@@ -68,12 +68,29 @@ build-example:
 
 build-all: $(GLIDE) $(SOURCES)
 	glide i
-	for CLIAPP in we toconfig bach ; do \
-	  for GOOS in linux darwin windows ; do \
-	    for GOARCH in amd64 386 ; do \
-	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/we-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
-	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/toconfig-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
-	       GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/bach-$(GOOS)-$(GOARCH)  ${LDFLAGS} ./cmd/cluster/ ; \
-	    done \
-	  done \
-	done
+
+	# amd64
+	GOOS=linux GOARCH=amd64 go build -o $(BINDIR)/we-linux-amd64       ${LDFLAGS} ./cmd/we/
+	GOOS=linux GOARCH=amd64 go build -o $(BINDIR)/toconfig-linux-amd64 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=linux GOARCH=amd64 go build -o $(BINDIR)/bach-linux-amd64     ${LDFLAGS} ./cmd/bach/
+
+	GOOS=windows GOARCH=amd64 go build -o $(BINDIR)/we-windows-amd64       ${LDFLAGS} ./cmd/we/
+	GOOS=windows GOARCH=amd64 go build -o $(BINDIR)/toconfig-windows-amd64 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=windows GOARCH=amd64 go build -o $(BINDIR)/bach-windows-amd64     ${LDFLAGS} ./cmd/bach/
+
+	GOOS=darwin GOARCH=amd64 go build -o $(BINDIR)/we-darwin-amd64       ${LDFLAGS} ./cmd/we/
+	GOOS=darwin GOARCH=amd64 go build -o $(BINDIR)/toconfig-darwin-amd64 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=darwin GOARCH=amd64 go build -o $(BINDIR)/bach-darwin-amd64     ${LDFLAGS} ./cmd/bach/
+
+	# i386
+	GOOS=linux GOARCH=386 go build -o $(BINDIR)/we-linux-386       ${LDFLAGS} ./cmd/we/
+	GOOS=linux GOARCH=386 go build -o $(BINDIR)/toconfig-linux-386 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=linux GOARCH=386 go build -o $(BINDIR)/bach-linux-386     ${LDFLAGS} ./cmd/bach/
+
+	GOOS=windows GOARCH=386 go build -o $(BINDIR)/we-windows-386       ${LDFLAGS} ./cmd/we/
+	GOOS=windows GOARCH=386 go build -o $(BINDIR)/toconfig-windows-386 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=windows GOARCH=386 go build -o $(BINDIR)/bach-windows-386     ${LDFLAGS} ./cmd/bach/
+
+	GOOS=darwin GOARCH=386 go build -o $(BINDIR)/we-darwin-386       ${LDFLAGS} ./cmd/we/
+	GOOS=darwin GOARCH=386 go build -o $(BINDIR)/toconfig-darwin-386 ${LDFLAGS} ./cmd/toconfig/
+	GOOS=darwin GOARCH=386 go build -o $(BINDIR)/bach-darwin-386     ${LDFLAGS} ./cmd/bach/
