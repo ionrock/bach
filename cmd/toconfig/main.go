@@ -1,11 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/ionrock/bach"
 	"github.com/urfave/cli"
 )
+
+var builddate = ""
+var gitref = ""
 
 func ApplyConfigAction(c *cli.Context) error {
 	return bach.ApplyConfig(c.String("template"), c.String("config"))
@@ -13,6 +17,8 @@ func ApplyConfigAction(c *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
+	app.Version = fmt.Sprintf("%s-%s", gitref, builddate)
+
 	app.Name = "toconfig"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

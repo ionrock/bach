@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -9,6 +10,9 @@ import (
 	"github.com/ionrock/bach"
 	"github.com/urfave/cli"
 )
+
+var builddate = ""
+var gitref = ""
 
 func applyWithEnv(v interface{}) {
 	log.Infof("%#v", v)
@@ -69,6 +73,8 @@ func RunBachAfter(c *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
+	app.Version = fmt.Sprintf("%s-%s", gitref, builddate)
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",

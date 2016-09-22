@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/ionrock/bach"
 	"github.com/urfave/cli"
 )
+
+var builddate = ""
+var gitref = ""
 
 func WeBefore(c *cli.Context) error {
 	bach.InitLogging(c.Bool("debug"))
@@ -22,8 +26,11 @@ func WeBefore(c *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
+	app.Version = fmt.Sprintf("%s-%s", gitref, builddate)
+
 	app.Name = "we"
 	app.Usage = "Add environment variables via YAML or scripts before running a command."
+	app.ArgsUsage = "[COMMAND]"
 	app.Before = WeBefore
 	app.Action = bach.CommandAction
 
@@ -36,13 +43,13 @@ func main() {
 
 		cli.StringSliceFlag{
 			Name:  "script, s",
-			Usage: "Execute a script that outputs YAML.",
+			Usage: "Execute a script that outputs YAML/JSON.",
 		},
 
 		cli.StringFlag{
 			Name:  "directory, d",
 			Value: "",
-			Usage: "A directory containing YAML files to recursively applyt to the environment.",
+			Usage: "A directory containing YAML/JSON files to recursively apply to the environment.",
 		},
 
 		cli.StringFlag{

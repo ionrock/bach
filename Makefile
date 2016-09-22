@@ -8,8 +8,8 @@ BINDIR=bin
 VERSION=1.0.0
 BUILD_TIME=`date +%FT%T%z`
 
-LDFLAGS=
-# LDFLAGS=-ldflags "-X github.com/ariejan/roll/core.Version=${VERSION} -X github.com/ariejan/roll/core.BuildTime=${BUILD_TIME}"
+VERSION=`git describe --tags --long --always --dirty`
+LDFLAGS=-ldflags "-X main.builddate=$(BUILD_TIME) -X main.gitref=$(VERSION)"
 
 DOCKER_MACHINE_NAME=default
 DOCKER_PREP=eval `docker-machine env $(DOCKER_MACHINE_NAME)`
@@ -26,20 +26,20 @@ $(GLIDE):
 	go get github.com/Masterminds/glide
 	glide i
 
-$(BINDIR)/present-$(GOOS)-$(GOARCH): $(SOURCES)
-	go build -o $(BINDIR)/present-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/present/
+$(BINDIR)/present: $(SOURCES)
+	go build -o $(BINDIR)/present $(LDFLAGS) ./cmd/present/
 
-$(BINDIR)/cluster-$(GOOS)-$(GOARCH): $(SOURCES)
-	go build -o $(BINDIR)/cluster-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/cluster/
+$(BINDIR)/cluster: $(SOURCES)
+	go build -o $(BINDIR)/cluster $(LDFLAGS) ./cmd/cluster/
 
-$(BINDIR)/we-$(GOOS)-$(GOARCH): $(SOURCES)
-	go build -o $(BINDIR)/we-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/we/
+$(BINDIR)/we: $(SOURCES)
+	go build -o $(BINDIR)/we $(LDFLAGS) ./cmd/we/
 
-$(BINDIR)/toconfig-$(GOOS)-$(GOARCH): $(SOURCES)
-	go build -o $(BINDIR)/toconfig-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/toconfig/
+$(BINDIR)/toconfig: $(SOURCES)
+	go build -o $(BINDIR)/toconfig $(LDFLAGS) ./cmd/toconfig/
 
-$(BINDIR)/bach-$(GOOS)-$(GOARCH): $(SOURCES)
-	go build -o $(BINDIR)/bach-$(GOOS)-$(GOARCH) $(LDFLAGS) ./cmd/bach/
+$(BINDIR)/bach: $(SOURCES)
+	go build -o $(BINDIR)/bach $(LDFLAGS) ./cmd/bach/
 
 
 clean:
