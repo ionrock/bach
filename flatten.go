@@ -148,7 +148,6 @@ func (f Flattener) flattenMap(env map[string]string, ev map[string]interface{}, 
 			f.flattenMap(env, v.(map[string]interface{}), append(prefix, k))
 		default:
 			key := flatKey(prefix, k)
-			log.Printf("key : %s", key)
 			env[key] = fmt.Sprintf("%v", v)
 		}
 	}
