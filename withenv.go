@@ -187,56 +187,52 @@ func updateEnvMap(cur, env map[string]string) map[string]string {
 	return cur
 }
 
+func findAction(flag string, value string) Action {
+	switch {
+	case flag == "--env" || flag == "-e":
+		return EnvFile{path: value}
+	case flag == "--script" || flag == "-s":
+		return EnvScript{cmd: value}
+	case flag == "--envvar" || flag == "-E":
+		return EnvVar{field: value}
+	case flag == "--directory" || flag == "-d":
+		return EnvDir{path: value}
+	case flag == "--alias" || flag == "-a":
+		return EnvAlias{path: value}
+	default:
+		return nil
+	}
+}
+
+func pairs(args []string) chan Action {
+	p := make(chan Action)
+
+	go func() {
+		var flag string
+		for i, f := range args {
+			if i%2 != 0 {
+				flag = f
+			} else {
+				action := findAction(flag, f)
+				if action != nil {
+					p <- action
+				}
+				break
+			}
+		}
+		close(p)
+	}()
+
+	return p
+}
+
 func WithEnv(args []string) (map[string]string, error) {
 
 	env := make(map[string]string)
 
-	in_flag := ""
-	for _, f := range args {
-		switch {
-		case f == "--env" || f == "-e":
-			in_flag = "env"
-		case in_flag == "env":
-			log.Debug("Applying env: ", f)
-			action := EnvFile{path: f}
-			env = updateEnvMap(env, action.Apply())
-			in_flag = ""
-
-		case f == "--script" || f == "-s":
-			in_flag = "script"
-		case in_flag == "script":
-			log.Debug("Applying script: ", f)
-			action := EnvScript{cmd: f}
-			env = updateEnvMap(env, action.Apply())
-			in_flag = ""
-
-		case f == "--envvar" || f == "-E":
-			in_flag = "envvar"
-		case in_flag == "envvar":
-			log.Debug("Applying single var: ", f)
-			action := EnvVar{field: f}
-			env = updateEnvMap(env, action.Apply())
-			in_flag = ""
-
-		case f == "--directory" || f == "-d":
-			in_flag = "directory"
-		case in_flag == "directory":
-			log.Debug("Applying directory: ", f)
-			action := EnvDir{path: f}
-			env = updateEnvMap(env, action.Apply())
-			in_flag = ""
-
-		case f == "--alias" || f == "-a":
-			in_flag = "alias"
-		case in_flag == "alias":
-			log.Debug("Applying alias: ", f)
-			action := EnvAlias{path: f}
-			env = updateEnvMap(env, action.Apply())
-			in_flag = ""
-
-		default:
-			break
-		}
+	for action := range pairs(args) {
+		log.Debug("Applying action: ", action)
+		env = updateEnvMap(env, action.Apply())
 	}
 
 	return env, nil
