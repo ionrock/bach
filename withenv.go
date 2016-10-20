@@ -64,7 +64,8 @@ func (e EnvFile) Apply() map[string]string {
 	}
 
 	for k, v := range env {
-		err = os.Setenv(k, v)
+		log.Infof("Setting: %s to %s", k, os.ExpandEnv(v))
+		err = os.Setenv(k, os.ExpandEnv(v))
 		if err != nil {
 			panic(err)
 		}
@@ -187,21 +188,12 @@ func updateEnvMap(cur, env map[string]string) map[string]string {
 	return cur
 }
 
-func findAction(flag string, value string) Action {
-	switch {
-	case flag == "--env" || flag == "-e":
-		return EnvFile{path: value}
-	case flag == "--script" || flag == "-s":
-		return EnvScript{cmd: value}
-	case flag == "--envvar" || flag == "-E":
-		return EnvVar{field: value}
-	case flag == "--directory" || flag == "-d":
-		return EnvDir{path: value}
-	case flag == "--alias" || flag == "-a":
-		return EnvAlias{path: value}
-	default:
-		return nil
+func ignore(flag string) bool {
+	if flag == "--debug" || flag == "-D" {
+		return true
 	}
+
+	return false
 }
 
 func pairs(args []string) chan Action {
@@ -209,15 +201,39 @@ func pairs(args []string) chan Action {
 
 	go func() {
 		var flag string
-		for i, f := range args {
-			if i%2 != 0 {
-				flag = f
-			} else {
-				action := findAction(flag, f)
-				if action != nil {
-					p <- action
+		var action Action
+
+		for _, f := range args {
+			log.Info(f)
+			if flag == "" {
+				if ignore(f) {
+					continue
+				} else {
+					flag = f
 				}
-				break
+			} else {
+				switch {
+				case flag == "--env" || flag == "-e":
+					action = EnvFile{path: f}
+				case flag == "--script" || flag == "-s":
+					action = EnvScript{cmd: f}
+				case flag == "--envvar" || flag == "-E":
+					action = EnvVar{field: f}
+				case flag == "--directory" || flag == "-d":
+					action = EnvDir{path: f}
+				case flag == "--alias" || flag == "-a":
+					action = EnvAlias{path: f}
+				default:
+					action = nil
+				}
+
+				if action == nil {
+					close(p)
+					return
+				} else {
+					p <- action
+					flag = ""
+				}
 			}
 		}
 		close(p)

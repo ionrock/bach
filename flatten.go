@@ -143,7 +143,7 @@ func (f Flattener) flattenMap(env map[string]string, ev map[string]interface{}, 
 		switch v.(type) {
 		case string:
 			key := flatKey(prefix, k)
-			env[key] = os.ExpandEnv(v.(string))
+			env[key] = v.(string)
 		case map[string]interface{}:
 			f.flattenMap(env, v.(map[string]interface{}), append(prefix, k))
 		default:

@@ -19,7 +19,7 @@ func WeBefore(c *cli.Context) error {
 
 	log.Debug("Computed Env")
 	for k, v := range env {
-		log.Debugf("export %s=%s", k, v)
+		log.Debugf("export %s=%s", k, os.ExpandEnv(v))
 	}
 	return err
 }
